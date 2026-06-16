@@ -124,5 +124,90 @@ public class App
         }
     }
 
-    public void Run() => throw new NotImplementedException();
+    public void Run()
+    {
+        Console.CursorVisible = false;
+        while (true)
+        {
+            Render();
+            var key = Console.ReadKey(intercept: true);
+            if (_insertMode)
+                HandleInsertKey(key);
+            else
+                HandleNormalKey(key);
+        }
+    }
+
+    private void HandleNormalKey(ConsoleKeyInfo key)
+    {
+        if (_dArmed && (DateTime.UtcNow - _dArmedAt).TotalSeconds > 1)
+            _dArmed = false;
+
+        switch (key.KeyChar)
+        {
+            case 'j':
+                _dArmed = false;
+                MoveCursorDown();
+                break;
+            case 'k':
+                _dArmed = false;
+                MoveCursorUp();
+                break;
+            case 'o':
+                _dArmed = false;
+                _insertMode = true;
+                _inputBuffer = "";
+                break;
+            case 'd':
+                if (_dArmed && (DateTime.UtcNow - _dArmedAt).TotalSeconds <= 1)
+                {
+                    _dArmed = false;
+                    DeleteSelected();
+                }
+                else
+                {
+                    _dArmed = true;
+                    _dArmedAt = DateTime.UtcNow;
+                }
+                break;
+            case '1': _dArmed = false; SetPriority(1); break;
+            case '2': _dArmed = false; SetPriority(2); break;
+            case '3': _dArmed = false; SetPriority(3); break;
+            case 'q':
+                Console.CursorVisible = true;
+                Console.Clear();
+                Environment.Exit(0);
+                break;
+        }
+
+        if (key.Key == ConsoleKey.Enter)
+        {
+            _dArmed = false;
+            ToggleComplete();
+        }
+    }
+
+    private void HandleInsertKey(ConsoleKeyInfo key)
+    {
+        if (key.Key == ConsoleKey.Enter)
+        {
+            AddTodo(_inputBuffer);
+            _insertMode = false;
+            _inputBuffer = "";
+        }
+        else if (key.Key == ConsoleKey.Escape)
+        {
+            _insertMode = false;
+            _inputBuffer = "";
+        }
+        else if (key.Key == ConsoleKey.Backspace)
+        {
+            if (_inputBuffer.Length > 0)
+                _inputBuffer = _inputBuffer[..^1];
+        }
+        else if (!char.IsControl(key.KeyChar))
+        {
+            _inputBuffer += key.KeyChar;
+        }
+    }
 }
