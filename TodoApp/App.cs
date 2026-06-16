@@ -70,5 +70,59 @@ public class App
         _store.Save(Todos);
     }
 
+    private void Render()
+    {
+        Console.Clear();
+        AnsiConsole.MarkupLine("[bold white]todo[/]");
+        AnsiConsole.WriteLine();
+
+        if (Todos.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[grey]No todos. Press [bold]o[/] to add one.[/]");
+        }
+        else
+        {
+            for (int i = 0; i < Todos.Count; i++)
+            {
+                var todo = Todos[i];
+                bool isCursor = i == CursorIndex;
+                var escaped = Markup.Escape(todo.Text);
+
+                string line;
+                if (todo.Completed)
+                {
+                    line = $"[grey strikethrough][x] {escaped}[/]";
+                }
+                else
+                {
+                    var color = todo.Priority switch
+                    {
+                        2 => "yellow",
+                        3 => "red",
+                        _ => "white"
+                    };
+                    line = $"[{color}][ ] {escaped}[/]";
+                }
+
+                var prefix = isCursor ? "[bold white]>[/]" : " ";
+                AnsiConsole.MarkupLine($" {prefix} {line}");
+            }
+        }
+
+        AnsiConsole.WriteLine();
+
+        if (_insertMode)
+        {
+            AnsiConsole.Markup($"[bold white]>[/] {Markup.Escape(_inputBuffer)}");
+        }
+        else
+        {
+            if (_dArmed)
+                AnsiConsole.MarkupLine("[yellow]d[/][grey] — press d again to delete[/]");
+            else
+                AnsiConsole.MarkupLine("[grey]j/k · o: add · Enter: done · dd: delete · 1/2/3: priority · q: quit[/]");
+        }
+    }
+
     public void Run() => throw new NotImplementedException();
 }
