@@ -1,10 +1,5 @@
-﻿// Entry point — wired up in Task 8
+using TodoApp;
 
-namespace TodoApp;
-
-class Program
-{
-    static void Main(string[] args)
-    {
-    }
-}
+var store = TodoStore.CreateDefault();
+var app = new App(store);
+app.Run();
