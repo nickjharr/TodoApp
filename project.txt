@@ -1,0 +1,7 @@
+create a console application todo app inspired by the vim's Netrw.
+
+- You should be able to create, complete and delete todos.
+- Todos should be one line, no title and body, just a single line like writing in a notebook
+- You should be able to set a priority, 1-3, with increasing priority shown by the text colour (white, yellow, red for increasing priority)
+- completed todos should have a line through them, and disappear the following day
+- data storage should be a simple json file
