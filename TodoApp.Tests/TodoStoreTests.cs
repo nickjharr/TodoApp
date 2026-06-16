@@ -56,4 +56,42 @@ public class TodoStoreTests
         Assert.Equal("Second", loaded[1].Text);
         Assert.Equal(2, loaded[1].Priority);
     }
+
+    [Fact]
+    public void Load_RemovesCompleted_FromPreviousDays()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+        var store = new TodoStore(path);
+        var yesterday = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+        store.Save([new("id1", "Old done", 1, true, yesterday)]);
+
+        var loaded = store.Load();
+
+        Assert.Empty(loaded);
+    }
+
+    [Fact]
+    public void Load_KeepsCompleted_FromToday()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+        var store = new TodoStore(path);
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        store.Save([new("id1", "Done today", 1, true, today)]);
+
+        var loaded = store.Load();
+
+        Assert.Single(loaded);
+    }
+
+    [Fact]
+    public void Load_KeepsIncomplete_Todos()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+        var store = new TodoStore(path);
+        store.Save([new("id1", "Not done", 1, false, null)]);
+
+        var loaded = store.Load();
+
+        Assert.Single(loaded);
+    }
 }
