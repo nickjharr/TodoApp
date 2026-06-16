@@ -91,7 +91,7 @@ public class App
                 string line;
                 if (todo.Completed)
                 {
-                    line = $"[grey strikethrough][x] {escaped}[/]";
+                    line = $"[grey strikethrough][[x]] {escaped}[/]";
                 }
                 else
                 {
@@ -101,7 +101,7 @@ public class App
                         3 => "red",
                         _ => "white"
                     };
-                    line = $"[{color}][ ] {escaped}[/]";
+                    line = $"[{color}][[ ]] {escaped}[/]";
                 }
 
                 var prefix = isCursor ? "[bold white]>[/]" : " ";
