@@ -52,9 +52,9 @@ public class TodoStoreTests
         var loaded = store.Load();
 
         Assert.Equal(2, loaded.Count);
-        Assert.Equal("First", loaded[0].Text);
-        Assert.Equal("Second", loaded[1].Text);
-        Assert.Equal(2, loaded[1].Priority);
+        Assert.Equal("Second", loaded[0].Text);
+        Assert.Equal(2, loaded[0].Priority);
+        Assert.Equal("First", loaded[1].Text);
     }
 
     [Fact]

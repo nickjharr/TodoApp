@@ -9,6 +9,7 @@ public class App
     public int CursorIndex { get; private set; }
 
     private bool _insertMode;
+    private bool _renameMode;
     private string _inputBuffer = "";
     private bool _dArmed;
     private DateTime _dArmedAt;
@@ -48,7 +49,9 @@ public class App
     public void SetPriority(int priority)
     {
         if (Todos.Count == 0 || priority < 1 || priority > 3) return;
+        var id = Todos[CursorIndex].Id;
         Todos[CursorIndex] = Todos[CursorIndex] with { Priority = priority };
+        SortAndTrack(id);
         _store.Save(Todos);
     }
 
@@ -61,13 +64,26 @@ public class App
         _store.Save(Todos);
     }
 
-    public void AddTodo(string text)
+    public void RenameTodo(string text)
+    {
+        if (Todos.Count == 0 || string.IsNullOrWhiteSpace(text)) return;
+        Todos[CursorIndex] = Todos[CursorIndex] with { Text = text.Trim() };
+        _store.Save(Todos);
+    }
+
+    public void AddTodo(string text, int priority = 1)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
-        var todo = new Todo(Guid.NewGuid().ToString(), text.Trim(), 1, false, null);
+        var todo = new Todo(Guid.NewGuid().ToString(), text.Trim(), priority, false, null);
         Todos.Add(todo);
-        CursorIndex = Todos.Count - 1;
+        SortAndTrack(todo.Id);
         _store.Save(Todos);
+    }
+
+    private void SortAndTrack(string id)
+    {
+        Todos = [.. Todos.OrderByDescending(t => t.Priority)];
+        CursorIndex = Todos.FindIndex(t => t.Id == id);
     }
 
     private void Render()
@@ -120,7 +136,7 @@ public class App
             if (_dArmed)
                 AnsiConsole.MarkupLine("[yellow]d[/][grey] — press d again to delete[/]");
             else
-                AnsiConsole.MarkupLine("[grey]j/k · o: add · Enter: done · dd: delete · 1/2/3: priority · q: quit[/]");
+                AnsiConsole.MarkupLine("[grey]j/k · o: add · r: rename · Enter: done · dd: delete · 1/2/3: priority · q: quit[/]");
         }
     }
 
@@ -156,7 +172,15 @@ public class App
             case 'o':
                 _dArmed = false;
                 _insertMode = true;
+                _renameMode = false;
                 _inputBuffer = "";
+                break;
+            case 'r':
+                if (Todos.Count == 0) break;
+                _dArmed = false;
+                _insertMode = true;
+                _renameMode = true;
+                _inputBuffer = Todos[CursorIndex].Text;
                 break;
             case 'd':
                 if (_dArmed && (DateTime.UtcNow - _dArmedAt).TotalSeconds <= 1)
@@ -191,13 +215,18 @@ public class App
     {
         if (key.Key == ConsoleKey.Enter)
         {
-            AddTodo(_inputBuffer);
+            if (_renameMode)
+                RenameTodo(_inputBuffer);
+            else
+                AddTodo(_inputBuffer);
             _insertMode = false;
+            _renameMode = false;
             _inputBuffer = "";
         }
         else if (key.Key == ConsoleKey.Escape)
         {
             _insertMode = false;
+            _renameMode = false;
             _inputBuffer = "";
         }
         else if (key.Key == ConsoleKey.Backspace)
