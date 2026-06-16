@@ -38,11 +38,13 @@ public class App
         if (Todos.Count == 0) return;
         var todo = Todos[CursorIndex];
         var today = DateOnly.FromDateTime(DateTime.Today);
-        Todos[CursorIndex] = todo with
+        var updated = todo with
         {
             Completed = !todo.Completed,
             CompletedAt = !todo.Completed ? today : null
         };
+        Todos[CursorIndex] = updated;
+        SortAndTrack(updated.Id);
         _store.Save(Todos);
     }
 
@@ -82,7 +84,7 @@ public class App
 
     private void SortAndTrack(string id)
     {
-        Todos = [.. Todos.OrderByDescending(t => t.Priority)];
+        Todos = [.. Todos.OrderBy(t => t.Completed ? 1 : 0).ThenByDescending(t => t.Priority)];
         CursorIndex = Todos.FindIndex(t => t.Id == id);
     }
 
