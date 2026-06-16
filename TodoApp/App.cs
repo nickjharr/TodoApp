@@ -136,7 +136,7 @@ public class App
             if (_dArmed)
                 AnsiConsole.MarkupLine("[yellow]d[/][grey] — press d again to delete[/]");
             else
-                AnsiConsole.MarkupLine("[grey]j/k · o: add · r: rename · Enter: done · dd: delete · 1/2/3: priority · q: quit[/]");
+                AnsiConsole.MarkupLine("[grey]j/k · o: add · r: rename · Space: done · dd: delete · 1/2/3: priority · q: quit[/]");
         }
     }
 
@@ -204,7 +204,7 @@ public class App
                 break;
         }
 
-        if (key.Key == ConsoleKey.Enter)
+        if (key.Key == ConsoleKey.Spacebar)
         {
             _dArmed = false;
             ToggleComplete();

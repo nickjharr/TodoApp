@@ -20,7 +20,7 @@ Flags `-l` and `-a` are aliases for `list` and `add`.
 | `j` / `k` | move cursor down / up |
 | `o` | add a new todo |
 | `r` | rename selected todo |
-| `Enter` | toggle complete |
+| `Space` | toggle complete |
 | `dd` | delete selected todo |
 | `1` / `2` / `3` | set priority |
 | `q` | quit |
