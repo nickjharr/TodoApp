@@ -25,7 +25,9 @@ public class TodoStore
         var json = File.ReadAllText(_path);
         var todos = JsonSerializer.Deserialize<List<Todo>>(json, JsonOptions) ?? [];
         var today = DateOnly.FromDateTime(DateTime.Today);
-        return todos.Where(t => !(t.Completed && t.CompletedAt < today)).ToList();
+        return todos.Where(t => !(t.Completed && t.CompletedAt < today))
+                    .OrderByDescending(t => t.Priority)
+                    .ToList();
     }
 
     public void Save(List<Todo> todos)

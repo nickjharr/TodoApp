@@ -49,7 +49,9 @@ public class App
     public void SetPriority(int priority)
     {
         if (Todos.Count == 0 || priority < 1 || priority > 3) return;
+        var id = Todos[CursorIndex].Id;
         Todos[CursorIndex] = Todos[CursorIndex] with { Priority = priority };
+        SortAndTrack(id);
         _store.Save(Todos);
     }
 
@@ -74,8 +76,14 @@ public class App
         if (string.IsNullOrWhiteSpace(text)) return;
         var todo = new Todo(Guid.NewGuid().ToString(), text.Trim(), priority, false, null);
         Todos.Add(todo);
-        CursorIndex = Todos.Count - 1;
+        SortAndTrack(todo.Id);
         _store.Save(Todos);
+    }
+
+    private void SortAndTrack(string id)
+    {
+        Todos = [.. Todos.OrderByDescending(t => t.Priority)];
+        CursorIndex = Todos.FindIndex(t => t.Id == id);
     }
 
     private void Render()
